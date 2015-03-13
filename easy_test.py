@@ -1,11 +1,11 @@
 #!/usr/bin/python
 import os
+import sys
 import pexpect
 
 '''
 Easy Test Terminal Client
 Author: David Zhang
-Version: 1.0
 Last Updated: March 2015
 (C) Copyright David Zhang, 2015.
 
@@ -14,9 +14,12 @@ against the inputs.
 '''
 
 class EasyTest():
-	def __init__(self):
+	def __init__(self, path):
 		self._display_header()
-		self.root = os.getcwd()+'/tests/'
+		self.remote_dir = path
+		if path[-1]!='/':
+			self.remote_dir = path+'/'
+		self.root = self.remote_dir+'tests/'
 		self._check_dir(self.root)
 		while True:
 			try:
@@ -24,40 +27,29 @@ class EasyTest():
 			except:
 				exit()
 
-	def _append(self, path):
-		_buffer=[]
-		try:
-			while True:
-				_buffer.append(raw_input())
-		except KeyboardInterrupt:
-			f=open(path, 'a')
-			for i in _buffer:
-				f.write(i+'\n')
-			f.close()
-
 	def _add_content(self, name, path):
-		print 'Appending to slave {}, CTRL-C when done >'.format(name)
-		self._append(path)
+		print 'Editing slave {}, CTRL-C when done >'.format(name)
+		os.system('vim '+path)
 
 		f=open(path+'.out', 'w')
 		f.close()
 
-		print '\nAppending to slave\'s solution, CTRL-C when done >'
-		self._append(path+'.sol')
+		print '\nEditing slave\'s solution, CTRL-C when done >'
+		os.system('vim '+path+'.sol')
 
 	def _check_dir(self, _dir):
 		if not os.path.isdir(_dir):
-			pexpect.run('mkdir '+ _dir)
+			os.system('mkdir '+ _dir)
 
 	def _display_header(self):
 		wrap([
 			'Easy Test: A More Human Way to Test!',
-			'You can test using your slaves, or add/edit slaves!',
+			'You can test using your slaves, or edit your slaves!',
 		])
 
 	def _edit(self):
 		wrap(
-			['You are now editing slaves. Enter CTRL-C to stop editing >'],
+			['You are now editing slaves. Enter CTRL-C to stop editing'],
 			char='$',
 			alt='$',
 		)
@@ -73,7 +65,7 @@ class EasyTest():
 
 	def _session(self):
 		self.target = raw_input('\nEnter target file (with ext.) > ')
-		if not os.path.exists(os.getcwd()+'/'+self.target):
+		if not os.path.exists(self.remote_dir+self.target):
 			self._error(
 				'Target {0} is not valid.'.format(self.target),
 			)
@@ -81,6 +73,7 @@ class EasyTest():
 		strip_extension = self.target[:self.target.index('.')]
 		self.test_target = self.root+strip_extension+'/'
 		self._check_dir(self.test_target)
+		self.target = self.remote_dir+self.target
 
 		command = raw_input('[T]est with slaves or [E]dit slaves > ')
 		if command.lower() == 't':
@@ -92,17 +85,20 @@ class EasyTest():
 
 	def _test(self):
 		wrap(
-			['You are now testing slaves >'],
+			['You are now testing slaves'],
 			char='$',
 			alt='$',
 		)
+		if len(os.listdir(self.test_target))==0:
+			print '\nYou have no slaves for {}'.format(self.target)
+			return
 		for i in os.listdir(self.test_target):
 			if not is_slave(i):
 				continue
 			slave = self.test_target+i
 			out = slave+'.out'
 			sol = slave+'.sol'
-			os.system('./{0}<{1}>{2}'.format(self.target, slave, out))
+			os.system('{0}<{1}>{2}'.format(self.target, slave, out))
 			status = pexpect.run('diff {0} {1}'.format(out, sol))
 			if status:
 				wrap(
@@ -134,5 +130,12 @@ def wrap(lst, char='*', alt='*'):
 def is_slave(_file):
 	return True if '.' not in _file else False
 
+def main(argv):
+	if len(argv)==0:
+		print 'usage: python easy_test.py DIRECTORY_TO_TEST_TARGETS'
+		exit()
+	else:
+		e = EasyTest(argv[0])
+
 if __name__=='__main__':
-	e = EasyTest()
+	main(sys.argv[1:])
