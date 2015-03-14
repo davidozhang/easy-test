@@ -7,11 +7,12 @@ import pexpect
 '''
 Easy Test Terminal Client
 Author: David Zhang
+Version: 1.5
 Last Updated: March 2015
 (C) Copyright David Zhang, 2015.
 
-This module enables easy editing of test inputs, solutions and running tests
-against the inputs. For more info, refer to README.md or Wiki.
+This command line utility enables easy editing of test inputs, solutions and 
+running tests against the inputs. For more info, refer to README.md.
 '''
 
 class EasyTest():
@@ -134,7 +135,7 @@ def wrap(lst, char='*', alt='*'):
 
 def main(argv):
 	if len(argv)==0:
-		print 'usage: python easy_test.py DIRECTORY_TO_TEST_TARGETS'
+		print 'usage: python easy_test.py [test-directory]'
 		exit()
 	else:
 		e = EasyTest(argv[0])
