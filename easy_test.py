@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import os
 import sys
 import pexpect
@@ -44,10 +46,10 @@ class EasyTest():
 			)
 			return
 		try:
-			strip_extension = self.target_name[:self.target_name.index('.')]
+			strip_ext = self.target_name[:self.target_name.index('.')]
 		except ValueError:
 			pass
-		self.test_target = self.root+strip_extension+'/'
+		self.test_target = self.root+strip_ext+'/'
 		check_dir(self.test_target)
 		self.target = self.remote_dir+self.target_name
 		while True:
