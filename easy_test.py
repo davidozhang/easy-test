@@ -1,4 +1,3 @@
-#!/usr/bin/python
 import os
 import sys
 import pexpect
@@ -10,90 +9,76 @@ Last Updated: March 2015
 (C) Copyright David Zhang, 2015.
 
 This module enables easy editing of test inputs, solutions and running tests
-against the inputs.
+against the inputs. For more info, refer to README.md or Wiki.
 '''
 
 class EasyTest():
 	def __init__(self, path):
-		self._display_header()
-		self.remote_dir = path
-		if path[-1]!='/':
-			self.remote_dir = path+'/'
+		display_header()
+		self.remote_dir = path if path[-1]=='/' else path+'/'
 		self.root = self.remote_dir+'tests/'
-		self._check_dir(self.root)
+		check_dir(self.root)
 		while True:
 			try:
 				self._session()
 			except:
+				print '\n'
+				wrap(['Easy Test has terminated.'])
 				exit()
 
-	def _add_content(self, name, path):
-		print 'Editing slave {}, CTRL-C when done >'.format(name)
-		os.system('vim '+path)
-
-		f=open(path+'.out', 'w')
-		f.close()
-
-		print '\nEditing slave\'s solution, CTRL-C when done >'
-		os.system('vim '+path+'.sol')
-
-	def _check_dir(self, _dir):
-		if not os.path.isdir(_dir):
-			os.system('mkdir '+ _dir)
-
-	def _display_header(self):
-		wrap([
-			'Easy Test: A More Human Way to Test!',
-			'You can test using your slaves, or edit your slaves!',
-		])
-
 	def _edit(self):
-		wrap(
-			['You are now editing slaves. Enter CTRL-C to stop editing'],
-			char='$',
-			alt='$',
-		)
 		try:
 			while True:
-				self.slave = raw_input('\nEnter slave name > ')
-				self._add_content(self.slave, self.test_target+self.slave)
+				self.slave = raw_input('\n(Select Slave) > ')
+				add_content(self.slave, self.test_target+self.slave)
 		except KeyboardInterrupt:
 			return
 
-	def _error(self, log):
-		wrap(['ERROR > '+log], char='.', alt='|')
-
 	def _session(self):
-		self.target = raw_input('\nEnter target file (with ext.) > ')
-		if not os.path.exists(self.remote_dir+self.target):
-			self._error(
-				'Target {0} is not valid.'.format(self.target),
+		self.target_name = raw_input(
+			'\n(Select Target) > ',
+		)
+		if not os.path.exists(self.remote_dir+self.target_name):
+			error(
+				'Target {0} is not valid.'.format(self.target_name),
 			)
 			return
-		strip_extension = self.target[:self.target.index('.')]
+		try:
+			strip_extension = self.target_name[:self.target_name.index('.')]
+		except ValueError:
+			pass
 		self.test_target = self.root+strip_extension+'/'
-		self._check_dir(self.test_target)
-		self.target = self.remote_dir+self.target
+		check_dir(self.test_target)
+		self.target = self.remote_dir+self.target_name
+		while True:
+			try:
+				self._target_scope()
+			except KeyboardInterrupt:
+				break
 
-		command = raw_input('[T]est with slaves or [E]dit slaves > ')
+	def _target_scope(self):
+		command = raw_input(
+			'\n(Target: {}) [T]est or [E]dit slaves > '.format(
+				self.target_name,
+			),
+		)
 		if command.lower() == 't':
 			self._test()
 		elif command.lower() == 'e':
 			self._edit()
 		else:
-			self._error('Invalid Command')
+			error('Invalid Command')
 
 	def _test(self):
-		wrap(
-			['You are now testing slaves'],
-			char='$',
-			alt='$',
-		)
 		if len(os.listdir(self.test_target))==0:
-			print '\nYou have no slaves for {}'.format(self.target)
+			wrap(
+				['You have no slaves for {}'.format(self.target_name)],
+				char='.',
+				alt='|',
+			)
 			return
 		for i in os.listdir(self.test_target):
-			if not is_slave(i):
+			if '.out' in i or '.sol' in i:
 				continue
 			slave = self.test_target+i
 			out = slave+'.out'
@@ -114,6 +99,24 @@ class EasyTest():
 					alt='|',
 				)
 
+def add_content(name, path):
+	os.system('vim '+path)
+	os.system('vim '+path+'.sol')
+
+def check_dir(_dir):
+	if not os.path.isdir(_dir):
+		os.system('mkdir '+ _dir)
+
+def display_header():
+		wrap([
+			'Easy Test: A More Human Way to Test!',
+			'Edit or test your targets with their slaves.',
+			'Select Target <-> Test with Slaves/Edit Slaves <-> Select Slave',
+		])
+
+def error(log):
+		wrap(['ERROR > '+log], char='.', alt='|')
+
 def wrap(lst, char='*', alt='*'):
 	border = ''
 	_max = 0
@@ -126,9 +129,6 @@ def wrap(lst, char='*', alt='*'):
 	for j in lst:
 		print alt+' '+j+' '*(_max-1-len(alt+' '+j))+alt
 	print border
-
-def is_slave(_file):
-	return True if '.' not in _file else False
 
 def main(argv):
 	if len(argv)==0:
