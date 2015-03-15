@@ -7,7 +7,7 @@ import pexpect
 '''
 Easy Test Terminal Client
 Author: David Zhang
-Version: 1.5
+Version: 1.6
 Last Updated: March 2015
 (C) Copyright David Zhang, 2015.
 
@@ -29,11 +29,42 @@ class EasyTest():
 				wrap(['Easy Test has terminated.'])
 				exit()
 
+	def _compile(self):
+		compilers = {'.c':'gcc', '.cc': 'g++', '.cpp': 'g++'}
+		extension = self.target_name[self.target_name.index('.'):]
+		if extension not in compilers:
+			return True
+		print 'Compiling {}...'.format(self.target_name)
+		status = pexpect.run(
+			'{0} -o {1} {2}'.format(
+				compilers[extension],
+				self.remote_dir + self.strip_ext,
+				self.target,
+			),
+		)
+		if status:
+			wrap(
+					['Compile [Not OK]'],
+					char='.',
+					alt='|',
+				)
+			print 'Here\'s the issue:\n'+status
+			return False
+		else:
+			wrap(
+					['Compile [OK]'],
+					char='.',
+					alt='|',
+				)
+			self.target = self.remote_dir + self.strip_ext
+			self.target_name = self.target_name[:self.target_name.index('.')]
+			return True
+
 	def _edit(self):
 		try:
 			while True:
 				self.slave = raw_input('\n(Select Slave) > ')
-				add_content(self.slave, self.test_target+self.slave)
+				add_content(self.test_target+self.slave)
 		except KeyboardInterrupt:
 			return
 
@@ -47,12 +78,14 @@ class EasyTest():
 			)
 			return
 		try:
-			strip_ext = self.target_name[:self.target_name.index('.')]
+			self.strip_ext = self.target_name[:self.target_name.index('.')]
 		except ValueError:
 			pass
-		self.test_target = self.root+strip_ext+'/'
+		self.test_target = self.root+self.strip_ext+'/'
 		check_dir(self.test_target)
 		self.target = self.remote_dir+self.target_name
+		if not self._compile():
+			return
 		while True:
 			try:
 				self._target_scope()
@@ -102,7 +135,7 @@ class EasyTest():
 					alt='|',
 				)
 
-def add_content(name, path):
+def add_content(path):
 	os.system('vim '+path)
 	os.system('vim '+path+'.sol')
 

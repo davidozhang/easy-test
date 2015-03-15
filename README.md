@@ -5,13 +5,17 @@ against the inputs.
 
 Version
 =======
-1.5
+1.6
 
 Terminology
 ===========
 Target: The file you are running the tests against.
 
 Slave: The test inputs you design for your target.
+
+Install
+=======
+####python setup.py install####
 
 Usage
 =====
@@ -36,8 +40,7 @@ To run the slaves against your target, simply navigate to _Test Target or Edit S
 Future Features
 =====
 The following features are considered and will be gradually rolled out as they become available:
-- Autocomplete file names in-program
+- Autocomplete file names and paths in-program
 - Browse and search directories in-program
-- Add configuration file option for more customization
-- Compile target (if applicable) while executing the program
+- Add configuration file option for greater test customization
 - Send target file to a remote server, check compile status (if applicable) and send test results back
