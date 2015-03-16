@@ -1,5 +1,8 @@
 easy-test
 =========
+
+[![Build Status](https://travis-ci.org/davidozhang/easy-test.svg?branch=master)](https://travis-ci.org/davidozhang/easy-test)
+
 This command line utility enables easy editing of test inputs, solutions and running tests
 against the inputs.
 
@@ -15,7 +18,7 @@ Slave: The test inputs you design for your target.
 
 Requirements
 ============
-Python 2 with Pip installed on Unix Machines (preferably Macs)
+Python 2 with Pip installed on Unix/Linux Machines
 
 Install
 =======
@@ -25,13 +28,13 @@ Usage
 =====
 ####python easy_test.py -d/--directory path_to_test_directory####
 
-Where test-directory is the directory where your test targets are located.
+test_directory is the directory where your test targets are located.
 
 The hierarchy of the interface is as follows:
 
-- Select Target
+- Select Target (enter 'list' to see all available targets)
     * Test Target, Edit Slaves or Delete Slaves
-        * Select Slave (to Edit or Delete)
+        * Select Slave (to Edit or Delete) (enter 'list' to see all available slaves)
 
 Travelling downwards of the hierarchy simply requires you to follow the program. Enter ```CTRL-C``` to move up the hierarchy. You can exit the program by entering ```CTRL-C``` at 'Select Target', or enter ```CTRL-D``` or ```CTRL-Z``` during execution.
 
@@ -46,9 +49,5 @@ To run the slaves against your target, simply navigate to _Test Target or Edit S
 Future Features
 =====
 The following features are considered and will be gradually rolled out as they become available:
-- Autocomplete file names and paths in-program
-- Detailed error results and performance analysis
-- Add description tag (optional) to slaves so search can be done (suitable for larger test input directories)
-- Add metadata directory in slave directory for keeping track of description tags of slaves and other information
 - Add configuration file option for greater test customization (ie. supporting different test scenarios, different configurations of slave and target types)
-- Send target file to a remote server, check compile status (if applicable) and send test results back
+- Send target file to a remote server, check compile status (if applicable) and send compiled target file back for local testing
