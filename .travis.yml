@@ -1,0 +1,6 @@
+language: python
+# command to install dependencies
+install:
+  - python setup.py install
+# script to run tests
+script: nosetests
