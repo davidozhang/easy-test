@@ -21,11 +21,15 @@ and running tests against the inputs. For more info, refer to README.md.
 
 class EasyTest():
 	def __init__(self, *args, **kwargs):
-		display_header()
 		path = kwargs['path']
 		self.base_dir = path if path[-1]=='/' else path+'/'
 		self.base_tests = self.base_dir+'tests/'
 		check_dir(self.base_tests)
+		self.test = False
+		if 'test' in kwargs and kwargs['test']:
+			self.test = True
+			return
+		display_header()
 		while True:
 			try:
 				self._session()
@@ -110,7 +114,7 @@ class EasyTest():
 		self.base_tests_target = self.base_tests+self.strip_ext+'/'
 		check_dir(self.base_tests_target)
 		self.target = self.base_dir+self.target_name
-		if not self._compile():
+		if not self._compile() or self.test:
 			return
 		while True:
 			try:
@@ -136,7 +140,7 @@ class EasyTest():
 	def _test(self):
 		if len(os.listdir(self.base_tests_target))==0:
 			error('You have no slaves for {}'.format(self.target_name)),
-			return
+			return False
 		for i in os.listdir(self.base_tests_target):
 			if '.out' in i or '.sol' in i:
 				continue
@@ -151,6 +155,7 @@ class EasyTest():
 				print 'Here\'s the issue:\n'+status
 			else:
 				print '\nSlave {0} [{1}]\n'.format(i, color(True)),
+		return True
 
 def add_content(path):
 	os.system('vim '+path)
