@@ -8,7 +8,13 @@ against the inputs.
 
 Version
 =======
-1.7
+2.0
+
+What's New
+==========
+- Added new configuration file option to pass through program
+- You could now connect to your server to run file compilation (currently supports C, C++) and send the executable back to test with
+- You could set your favourite editor's command line shortcut in the config file to open it up when editing slaves!
 
 Terminology
 ===========
@@ -26,9 +32,11 @@ Install
 
 Usage
 =====
+####python easy_test.py -c/--configuration path_to_configuration_file####
+OR
 ####python easy_test.py -d/--directory path_to_test_directory####
 
-test_directory is the directory where your test targets are located.
+where test_directory is the directory containing your test targets.
 
 The hierarchy of the interface is as follows:
 
@@ -40,14 +48,34 @@ Travelling downwards of the hierarchy simply requires you to follow the program.
 
 The program will check for directory ```/tests``` under your test-directory; if it doesn't exist it will create one. 
 
-When you choose a target, a directory with _the extension-stripped name of the target_ will be created under ```/tests``` . When you edit target slaves by entering ```E``` or ```e``` at _Test Target or Edit (Target) Slaves_, you will be asked for the slave's file name. The program will check the slave's existence and create the file if it doesn't exist. You will first be asked to enter the slave's content through vim of the slave file. After editing and saving the slave file, you will be asked to enter the slave's corresponding solution in a file with ```.sol``` appended to the slave's name.
+When you choose a target, a directory with _the extension-stripped name of the target_ will be created under ```/tests``` .
 
-You can delete target slaves by entering ```D``` or ```d``` at _Test Target or Edit (Target) Slaves_. You will be asked for the slave's file name. Safety features were implemented to prevent accidental deletion of files, such as using interactive rm to manually confirm deletes, displaying error warnings for non-existent files, and terminating the program when sensitive things are being rm-ed. The associated output and solution files will also be deleted.
+If your target needs to be compiled, it will be compiled when you select it. The extension-stripped file will become your new target. If you have specified a server IP address in the configuration file, then you will be connected to an interactive session on the server to allow you to run compile commands. Once you are done, simply ```CTRL-D``` to exit interactive session and the resulting executable will be copied to your test directory to become your new target.
 
-To run the slaves against your target, simply navigate to _Test Target or Edit Slaves_ and enter ```T``` or ```t```.
+To run the slaves against your target, simply enter ```T``` or ```t``` at _Test Target, Edit Slaves or Delete Slaves_.
+
+When you edit target slaves by entering ```E``` or ```e``` at _Test Target, Edit Slaves or Delete Slaves_, you will be asked for the slave's file name. The program will check the slave's existence and create the file if it doesn't exist. You will first be asked to enter the slave's content through vim of the slave file. After editing and saving the slave file, you will be asked to enter the slave's corresponding solution in a file with ```.sol``` appended to the slave's name.
+
+You can delete target slaves by entering ```D``` or ```d``` at _Test Target, Edit Slaves or Delete Slaves_. You will be asked for the slave's file name. Safety features were implemented to prevent accidental deletion of files, such as using interactive rm to manually confirm deletes, displaying error warnings for non-existent files, and terminating the program when sensitive things are being rm-ed. The associated output and solution files will also be deleted.
+
+Configuration File
+==================
+Currently, the following configuration keys are supported:
+
+- server-ip: The IP address of the remote server you wish to compile files on
+- test-directory: The directory containing your test targets
+- editor: The command-line shortcut for your favourite editor
+
+A line that starts with a '#' is considered a comment. Please ensure that a space follows the semi-colons.
+
+See the file ```sample-configuration``` for an example of such file. You can name your configuration file anything!
+
+Mandatory key: test-directory
+
+Optional keys: server-ip, editor (by default easy-test will use ```vim```)
 
 Future Features
-=====
-The following features are considered and will be gradually rolled out as they become available:
-- Add configuration file option for greater test customization (ie. supporting different test scenarios, different configurations of slave and target types)
-- Send target file to a remote server, check compile status (if applicable) and send compiled target file back for local testing
+===============
+- More configuration file options will be supported for greater test customization, including:
+	* Supporting different test scenarios
+	* Custom definition of targets, slaves and solutions

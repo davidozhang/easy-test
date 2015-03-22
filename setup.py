@@ -5,7 +5,7 @@ except ImportError:
 
 setup (
     name='easy-test',
-    version='1.7',
+    version='2.0',
     py_modules=['easy_test'],
     description='Easy test-running and editing of test input and solutions.',
     author='David Zhang',
