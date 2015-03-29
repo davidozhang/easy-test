@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
+import datetime
 import os
 import sys
+import time
 import argparse
 
 import pexpect
@@ -13,7 +15,7 @@ from configuration import Configuration
 '''
 Easy Test Terminal Client
 Author: David Zhang
-Version: 2.0
+Version: 2.1
 Last Updated: March 2015
 (C) Copyright David Zhang, 2015.
 
@@ -154,11 +156,15 @@ class EasyTest():
         self.target = self.base_dir+self.target_name
         if not self._compile() or self.test:
             return
-        while True:
-            try:
-                self._target_scope()
-            except KeyboardInterrupt:
-                break
+        if self.configs and 'auto-trigger' in self.configs and \
+            self.configs['auto-trigger'] == 'True':
+                self._auto_trigger()
+        else:
+            while True:
+                try:
+                    self._target_scope()
+                except KeyboardInterrupt:
+                    break
 
     def _target_scope(self):
         command = raw_input(
@@ -193,7 +199,27 @@ class EasyTest():
                 print 'Here\'s the issue:\n'+status
             else:
                 print '\nSlave {0} [{1}]\n'.format(i, color(True)),
+        print '\nTest Timestamp: {}'.format(datetime.datetime.now())
+        print '-'*42
         return True
+
+    def _auto_trigger(self):
+        from monitor import EasyTestMonitor
+        self.monitor = EasyTestMonitor(
+            path=self.target,
+            directory=self.base_dir,
+            object=self,
+        )
+        self.monitor._start()
+        print '(Target {}) Auto Trigger Interface, CTRL-C to Exit > '.format(
+            self.target_name,
+        )
+        while True:
+            try:
+                time.sleep(1)
+            except KeyboardInterrupt:
+                break
+        self.monitor._stop()
 
 
 def add_content(path, editor='vim'):
@@ -209,7 +235,7 @@ def check_dir(_dir):
 def display_header():
     wrap([
         'Easy Test: A More Human Way to Test!',
-        'New in 2.0: Use config file option to customize your testing!',
+        'New in 2.1: Auto-trigger tests option available through config!',
         'View README.md for more info on how to use the program.',
     ])
 

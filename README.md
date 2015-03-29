@@ -8,13 +8,17 @@ against the inputs.
 
 Version
 =======
-2.0
+2.1
 
 What's New
 ==========
-- Added new configuration file option to pass through program
-- You could now connect to your server to run file compilation (currently supports C, C++) and send the executable back to test with
-- You could set your favourite editor's command line shortcut in the config file to open it up when editing slaves!
+- Dedicated auto test trigger interface after selecting target to run tests as soon as you save your changes (currently only supports scripting-language-based targets)
+- Auto test trigger can be configured on and off through configuration file
+- Show the date and time of each test run
+
+Recommended Usage
+=================
+It is recommended to use two terminal windows. One terminal window should be open with easy_test configured to have auto-trigger on, so you can easily see test results as you save your changes. Another terminal window should run easy_test with auto-trigger off, allowing easy editing of slaves
 
 Terminology
 ===========
@@ -41,7 +45,7 @@ where test_directory is the directory containing your test targets.
 The hierarchy of the interface is as follows:
 
 - Select Target (enter 'list' to see all available targets)
-    * Test Target, Edit Slaves or Delete Slaves
+    * Test Target, Edit Slaves or Delete Slaves / Dedicated Auto-Trigger Interface
         * Select Slave (to Edit or Delete) (enter 'list' to see all available slaves)
 
 Travelling downwards of the hierarchy simply requires you to follow the program. Enter ```CTRL-C``` to move up the hierarchy. You can exit the program by entering ```CTRL-C``` at 'Select Target', or enter ```CTRL-D``` or ```CTRL-Z``` during execution.
@@ -65,14 +69,15 @@ Currently, the following configuration keys are supported:
 - server-ip: The IP address of the remote server you wish to compile files on
 - test-directory: The directory containing your test targets
 - editor: The command-line shortcut for your favourite editor
+- auto-trigger: Runs tests as soon as you save your changes to target. Supports either ```True``` or ```False```.
 
-A line that starts with a '#' is considered a comment. Please ensure that a space follows the semi-colons.
+A line that starts with a '#' is considered a comment. _Please ensure that a space follows the semi-colons_.
 
 See the file ```sample-configuration``` for an example of such file. You can name your configuration file anything!
 
 Mandatory key: test-directory
 
-Optional keys: server-ip, editor (by default easy-test will use ```vim```)
+Optional keys: server-ip, editor (by default easy-test will use ```vim```), auto-trigger
 
 Future Features
 ===============

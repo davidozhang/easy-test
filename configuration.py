@@ -8,6 +8,7 @@ class Configuration():
         self.accepted = Set([
             'server-ip',
             'editor',
+            'auto-trigger',
         ])
         self.file_path = kwargs['path']
         self.result = {}

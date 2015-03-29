@@ -6,3 +6,7 @@ test-directory: ./
 
 # Specify the your preferred editor's command line shortcut
 editor: subl
+
+# Specify if you want to trigger tests automatically for a target upon save
+# (Interface will show after you select your target)
+auto-trigger: True
